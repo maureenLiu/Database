@@ -3,7 +3,6 @@ package com.maureen.reflect;
 import com.maureen.entity.Dept;
 import com.maureen.entity.Emp;
 import com.maureen.util.DBUtil;
-import com.sun.xml.internal.ws.api.model.MEP;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -24,7 +23,7 @@ public class BaseDaoImpl {
      * @param clazz  sql语句查询返回的对象
      * @return
      */
-    public List getRows(String sql, Object[] params, Class clazz) {
+    public List query(String sql, Object[] params, Class clazz) {
         List list = new ArrayList();
         Connection connection = null;
         PreparedStatement pstmt = null;
@@ -95,13 +94,37 @@ public class BaseDaoImpl {
         return "set" + name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
+    /**
+     * 统一修改数据的方法，包含增加。删除和修改数据
+     * @param sql     不同的sql语句
+     * @param params  sql语句的参数
+     */
+    public void modify(String sql, Object[] params) {
+        Connection connection = null;
+        PreparedStatement pstmt = null;
+        try {
+            connection = DBUtil.getConnection();
+            pstmt = connection.prepareStatement(sql);
+            if(params != null) {
+                for(int i = 0; i < params.length; i++) {
+                    pstmt.setObject(i+1, params[i]);
+                }
+            }
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBUtil.closeConnection(connection, pstmt);
+        }
+    }
+
     public static void main(String[] args) {
         BaseDaoImpl baseDao = new BaseDaoImpl();
 
         System.out.println("===========查询emp表：");
         //测试：查询emp表中的数据
         String sql1 = "select empno, ename, deptno from emp where deptno = ?";
-        List rows1 = baseDao.getRows(sql1, new Object[]{10}, Emp.class);
+        List rows1 = baseDao.query(sql1, new Object[]{10}, Emp.class);
         for(Iterator it = rows1.iterator(); it.hasNext(); ) {
             Emp emp = (Emp) it.next();
             System.out.println(emp);
@@ -110,10 +133,32 @@ public class BaseDaoImpl {
         System.out.println("===========查询dept表：");
         //测试：查询dept表中的数据
         String sql2 = "select deptno, dname, loc from dept";
-        List rows2 = baseDao.getRows(sql2, new Object[]{}, Dept.class);
+        List rows2 = baseDao.query(sql2, new Object[]{}, Dept.class);
         for(Iterator it = rows2.iterator(); it.hasNext(); ) {
             Dept dept = (Dept) it.next();
             System.out.println(dept);
         }
+
+        System.out.println("===========插入数据到emp表：");
+        String insert_sql = "insert into emp(empno, ename) values(?,?)";
+        baseDao.modify(insert_sql, new Object[]{999,"Maureen"});
+
+        System.out.println("==========插入数据到dept表：");
+        String insert_sql1 = "insert into dept(deptno, dname) values(?,?)";
+        baseDao.modify(insert_sql1, new Object[]{50, "Travel"});
+
+
+        System.out.println("=========删除emp表中的数据：");
+        String delete_sql = "delete from emp where empno = ?";
+        baseDao.modify(delete_sql, new Object[]{999});
+
+        System.out.println("=========删除dept表中的数据：");
+        String delete_sql1 = "delete from dept where deptno = ?";
+        baseDao.modify(delete_sql1, new Object[]{50});
+
+        System.out.println("============更新emp表中的数据：");
+        //执行update操作之前一定要先将之前的事务commit了，否则update操作会卡死
+        String update_sql = "update emp set job = ? where empno = ?";
+        baseDao.modify(update_sql, new Object[]{"Clerk",999});
     }
 }
