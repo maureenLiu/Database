@@ -4,6 +4,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+/**
+ * Tips：
+ *  newInstance()方法默认会调用无参构造方法，所以在写构造方法的时候，尽量都将无参构造方法写上
+ */
 public class ClassAPI {
     public static void main(String[] args) throws Exception {
         //创建Class对象

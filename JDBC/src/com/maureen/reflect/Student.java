@@ -4,7 +4,9 @@ public class Student extends Person {
     public String className;
     private String address;
 
-    public Student() {}
+    public Student() {
+        super();
+    }
 
     public Student(String name, int age, String className, String address) {
         super(name, age);
