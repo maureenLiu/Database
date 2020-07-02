@@ -11,11 +11,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * 想查询N张表的数据，但是不想写N多的方法，能否写一个方法完成所有表的查询工作
- */
 public class BaseDaoImpl {
     /**
+     * 查询N张表的数据，但是不想写N多的方法，能否写一个方法完成所有表的查询工作？
      * 统一的查询表的方法
      *
      * @param sql    不同的sql语句
@@ -96,8 +94,9 @@ public class BaseDaoImpl {
 
     /**
      * 统一修改数据的方法，包含增加。删除和修改数据
-     * @param sql     不同的sql语句
-     * @param params  sql语句的参数
+     *
+     * @param sql    不同的sql语句
+     * @param params sql语句的参数
      */
     public void modify(String sql, Object[] params) {
         Connection connection = null;
@@ -105,9 +104,9 @@ public class BaseDaoImpl {
         try {
             connection = DBUtil.getConnection();
             pstmt = connection.prepareStatement(sql);
-            if(params != null) {
-                for(int i = 0; i < params.length; i++) {
-                    pstmt.setObject(i+1, params[i]);
+            if (params != null) {
+                for (int i = 0; i < params.length; i++) {
+                    pstmt.setObject(i + 1, params[i]);
                 }
             }
             pstmt.executeUpdate();
@@ -125,7 +124,7 @@ public class BaseDaoImpl {
         //测试：查询emp表中的数据
         String sql1 = "select empno, ename, deptno from emp where deptno = ?";
         List rows1 = baseDao.query(sql1, new Object[]{10}, Emp.class);
-        for(Iterator it = rows1.iterator(); it.hasNext(); ) {
+        for (Iterator it = rows1.iterator(); it.hasNext(); ) {
             Emp emp = (Emp) it.next();
             System.out.println(emp);
         }
@@ -134,14 +133,14 @@ public class BaseDaoImpl {
         //测试：查询dept表中的数据
         String sql2 = "select deptno, dname, loc from dept";
         List rows2 = baseDao.query(sql2, new Object[]{}, Dept.class);
-        for(Iterator it = rows2.iterator(); it.hasNext(); ) {
+        for (Iterator it = rows2.iterator(); it.hasNext(); ) {
             Dept dept = (Dept) it.next();
             System.out.println(dept);
         }
 
         System.out.println("===========插入数据到emp表：");
         String insert_sql = "insert into emp(empno, ename) values(?,?)";
-        baseDao.modify(insert_sql, new Object[]{999,"Maureen"});
+        baseDao.modify(insert_sql, new Object[]{999, "Maureen"});
 
         System.out.println("==========插入数据到dept表：");
         String insert_sql1 = "insert into dept(deptno, dname) values(?,?)";
@@ -159,6 +158,6 @@ public class BaseDaoImpl {
         System.out.println("============更新emp表中的数据：");
         //执行update操作之前一定要先将之前的事务commit了，否则update操作会卡死
         String update_sql = "update emp set job = ? where empno = ?";
-        baseDao.modify(update_sql, new Object[]{"Clerk",999});
+        baseDao.modify(update_sql, new Object[]{"Clerk", 999});
     }
 }
