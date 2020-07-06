@@ -8,6 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * 使用ComboPooledDataSource获取连接
+ */
 public class C3P0Test {
     public static Connection connection;
     public static ComboPooledDataSource dataSource;
